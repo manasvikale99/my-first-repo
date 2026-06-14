@@ -345,24 +345,41 @@ section{
   color:var(--accent);text-align:center;margin-top:28px;
   line-height:1;transition:color .4s ease;
 }
-/* S9 TABLE */
+/* S9 INITIATIVES */
 #s9{
   background:var(--bg);justify-content:flex-start;
-  padding:72px 20px 24px;overflow-y:auto;transition:background .4s ease;
+  padding:62px 0 0;overflow-y:auto;transition:background .4s ease;
 }
-.data-tbl{width:100%;max-width:860px;border-collapse:collapse;margin:0 auto;}
-.data-tbl th{
-  text-align:left;font-size:11px;letter-spacing:.22em;text-transform:uppercase;
-  color:var(--accent);padding:12px 14px;border-bottom:1px solid var(--accent-dim);
-  transition:color .4s ease,border-color .4s ease;
+.s9-inner{max-width:880px;width:100%;margin:0 auto;padding:14px 24px 28px;}
+.init-row{
+  display:flex;align-items:center;gap:16px;
+  padding:13px 14px;border-radius:8px;
+  transition:background .2s;opacity:0;transform:translateY(16px);
+  cursor:default;
 }
-.data-tbl td{
-  padding:13px 14px;font-size:15px;color:var(--text-primary);line-height:1.4;
-  border-bottom:1px solid rgba(201,168,76,.06);transition:color .4s ease,background .4s ease,border-color .4s ease;
+.init-row:hover{background:rgba(201,168,76,.06);}
+.init-row:hover .init-bar{filter:brightness(1.25);}
+.init-left{flex:0 0 240px;display:flex;align-items:center;gap:11px;}
+.init-emoji{font-size:19px;flex-shrink:0;width:26px;text-align:center;}
+.init-name{font-size:14px;font-weight:600;color:var(--text-primary);transition:color .4s ease;}
+.init-cost-lbl{font-family:Georgia,serif;font-size:11px;color:var(--text-secondary);margin-top:2px;transition:color .4s ease;}
+.init-bar-wrap{
+  flex:1;height:7px;background:rgba(201,168,76,.1);
+  border-radius:4px;overflow:hidden;
 }
-.data-tbl tr:nth-child(even) td{background:rgba(201,168,76,.04);}
-.data-tbl td:nth-child(3){color:var(--teal);font-family:Georgia,serif;}
-.trow{opacity:0;transform:translateY(18px);}
+.init-bar{
+  height:100%;width:0%;border-radius:4px;
+  background:linear-gradient(to right,var(--accent-dim),var(--accent));
+  transition:background .4s ease,filter .2s;
+}
+.init-bar.is-big{background:linear-gradient(to right,var(--teal),var(--accent));}
+.init-right{flex:0 0 170px;text-align:right;}
+.init-impact{
+  font-family:Georgia,serif;font-size:clamp(14px,1.4vw,18px);
+  color:var(--teal);line-height:1.1;transition:color .4s ease;
+}
+.init-pct-lbl{font-size:10px;color:var(--text-secondary);margin-top:3px;letter-spacing:.03em;transition:color .4s ease;}
+.init-divider{height:1px;background:rgba(201,168,76,.07);margin:2px 14px;transition:background .4s ease;}
 /* S10 KICKER */
 #s10{background:var(--bg);transition:background .4s ease;}
 .kl{opacity:0;transform:translateY(22px);text-align:center;transition:color .4s ease;}
@@ -605,20 +622,13 @@ section{
   <div class="body-copy" style="margin-top:20px;font-style:italic;">"And he'd only be halfway through."</div>
 </section>
 
-<!-- SECTION 9: TABLE -->
+<!-- SECTION 9: INITIATIVES -->
 <section id="s9">
-  <div class="eyebrow" style="text-align:center;width:100%;">Global Initiatives</div>
-  <div class="hed">What the world needs. What he could fund.</div>
-  <table class="data-tbl" id="init-table">
-    <thead>
-      <tr>
-        <th>Initiative</th>
-        <th>Cost</th>
-        <th>Musk Could Fund</th>
-      </tr>
-    </thead>
-    <tbody id="tbl-body"></tbody>
-  </table>
+  <div class="s9-inner">
+    <div class="eyebrow" style="text-align:center;">Global Initiatives</div>
+    <div class="hed">What the world needs. What he could fund.</div>
+    <div id="init-list"></div>
+  </div>
 </section>
 
 <!-- SECTION 10: KICKER -->
@@ -919,24 +929,35 @@ function resetSpend() {
 }
 buildFunds();
 
-// ── TABLE DATA (S9) ───────────────────────────────────────
-const ROWS = [
-  ['End world hunger','$93B/yr','11.3 years'],
-  ['Clean water for all','$1.04T one-time','Done. Forever.'],
-  ['Global child vaccines','$10B/yr','105 years'],
-  ['Malaria eradication','$10B one-time','105 campaigns'],
-  ['WHO operating budget','$6B/yr','175 years'],
-  ['UN operating budget','$3.5B/yr','300 years'],
-  ['Global refugee aid','$10B/yr','105 years'],
-  ['Africa infrastructure gap','$600B one-time','Fully funded'],
-  ['Global mental health (10yr)','$80B total','13 decades'],
+// ── INITIATIVES DATA (S9) ─────────────────────────────────
+const INITIATIVES = [
+  {e:'🌍',name:'End world hunger',cost:'$93B / year',pct:8.9,impact:'11.3 years funded'},
+  {e:'💧',name:'Universal clean water',cost:'$1.04T one-time',pct:99,impact:'Done. Forever.'},
+  {e:'💉',name:'Global child vaccines',cost:'$10B / year',pct:1.0,impact:'105 years funded'},
+  {e:'🦟',name:'Malaria eradication',cost:'$10B one-time',pct:1.0,impact:'105 campaigns'},
+  {e:'🏥',name:'WHO operating budget',cost:'$6B / year',pct:0.57,impact:'175 years funded'},
+  {e:'🌐',name:'UN operating budget',cost:'$3.5B / year',pct:0.33,impact:'300 years funded'},
+  {e:'🏠',name:'Global refugee aid',cost:'$10B / year',pct:1.0,impact:'105 years funded'},
+  {e:'🌍',name:'Africa infrastructure gap',cost:'$600B one-time',pct:57,impact:'Fully funded'},
+  {e:'🧠',name:'Global mental health',cost:'$80B total',pct:7.6,impact:'13 decades'},
 ];
-const tbody = document.getElementById('tbl-body');
-ROWS.forEach(r=>{
-  const tr=document.createElement('tr');
-  tr.className='trow';
-  tr.innerHTML=`<td>${r[0]}</td><td style="color:var(--text-secondary)">${r[1]}</td><td>${r[2]}</td>`;
-  tbody.appendChild(tr);
+const initList = document.getElementById('init-list');
+INITIATIVES.forEach((d,i)=>{
+  const row = document.createElement('div');
+  row.className = 'init-row';
+  row.innerHTML =
+    '<div class="init-left"><span class="init-emoji">'+d.e+'</span>'+
+    '<div><div class="init-name">'+d.name+'</div>'+
+    '<div class="init-cost-lbl">'+d.cost+'</div></div></div>'+
+    '<div class="init-bar-wrap"><div class="init-bar'+(d.pct>50?' is-big':'')+'" data-pct="'+Math.min(d.pct,100)+'"></div></div>'+
+    '<div class="init-right"><div class="init-impact">'+d.impact+'</div>'+
+    '<div class="init-pct-lbl">'+d.pct+'% of his wealth</div></div>';
+  initList.appendChild(row);
+  if(i < INITIATIVES.length-1){
+    const div=document.createElement('div');
+    div.className='init-divider';
+    initList.appendChild(div);
+  }
 });
 
 // ── GSAP + ScrollTrigger ──────────────────────────────────
@@ -983,10 +1004,12 @@ ScrollTrigger.create({trigger:'#s8',start:'top center',once:true,onEnter:()=>{
   gsap.to('#tl-remain',{opacity:1,y:0,delay:1.2,duration:.7,ease:'power2.out'});
 }});
 
-// S9 table rows
+// S9 initiative rows
 ScrollTrigger.create({trigger:'#s9',start:'top center',once:true,onEnter:()=>{
-  document.querySelectorAll('.trow').forEach((r,i)=>{
-    gsap.to(r,{opacity:1,y:0,delay:i*.09,duration:.5,ease:'power2.out'});
+  document.querySelectorAll('.init-row').forEach((row,i)=>{
+    gsap.to(row,{opacity:1,y:0,delay:i*.07,duration:.5,ease:'power2.out'});
+    const bar = row.querySelector('.init-bar');
+    gsap.to(bar,{width:bar.dataset.pct+'%',delay:i*.07+.2,duration:.9,ease:'power2.out'});
   });
 }});
 
