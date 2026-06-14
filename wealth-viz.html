@@ -219,69 +219,119 @@ section{
   transition:opacity .15s,background .4s ease,color .4s ease,border-color .4s ease;
   z-index:500;
 }
-/* S7 SPEND */
+/* S7 SPEND — two-panel */
 #s7{
-  background:var(--bg);justify-content:flex-start;
-  padding:72px 20px 20px;overflow-y:auto;
-  transition:background .4s ease;
+  background:var(--bg);display:flex;flex-direction:column;
+  justify-content:flex-start;padding-top:62px;
+  transition:background .4s ease;overflow:hidden;
 }
-#remain-val{
-  font-family:Georgia,serif;font-size:clamp(1.8rem,5vw,3.5rem);
-  color:var(--accent);text-align:center;margin-bottom:4px;
-  transition:color .4s ease;
+.spend-layout{
+  display:flex;flex:1;width:100%;max-width:1080px;
+  margin:0 auto;padding:16px 20px 20px;gap:20px;
+  height:calc(100vh - 62px);
 }
-#remain-lbl{
-  font-size:12px;letter-spacing:.3em;color:var(--text-secondary);
-  text-align:center;text-transform:uppercase;margin-bottom:10px;
-  transition:color .4s ease;
+/* LEFT — scrollable card list */
+.fund-cards-col{
+  flex:3;display:flex;flex-direction:column;gap:7px;
+  overflow-y:auto;padding-right:4px;
 }
-#spend-msg{
-  text-align:center;font-family:Georgia,serif;font-size:1.1rem;
-  color:var(--teal);min-height:28px;margin-bottom:4px;transition:color .4s ease;
+.fund-cards-col::-webkit-scrollbar{width:3px;}
+.fund-cards-col::-webkit-scrollbar-track{background:transparent;}
+.fund-cards-col::-webkit-scrollbar-thumb{background:var(--accent-dim);border-radius:2px;}
+.fc2{
+  display:flex;align-items:center;gap:12px;
+  background:var(--surface);border:1px solid rgba(201,168,76,.14);
+  border-radius:8px;padding:11px 14px;cursor:grab;
+  transition:all .2s ease;user-select:none;flex-shrink:0;
 }
-#reset-btn{
-  display:block;margin:4px auto 16px;background:none;
-  border:1px solid var(--text-secondary);color:var(--text-secondary);
-  padding:6px 18px;font-size:12px;cursor:pointer;border-radius:3px;
-  letter-spacing:.1em;text-transform:uppercase;transition:all .3s;
+.fc2:hover{border-color:var(--accent-dim);transform:translateX(3px);}
+.fc2.dragging{opacity:.35;transform:scale(.97);}
+.fc2.funded2{
+  opacity:.45;border-color:rgba(58,191,171,.25);cursor:default;
+  background:rgba(58,191,171,.04);transform:none;
 }
-#reset-btn:hover{border-color:var(--accent);color:var(--accent);}
-#fund-grid{
-  display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
-  gap:12px;max-width:980px;width:100%;margin:0 auto;
-}
-.fc{perspective:700px;height:148px;}
-.fc-inner{
-  width:100%;height:100%;position:relative;
-  transform-style:preserve-3d;transition:transform .5s ease;
-}
-.fc.funded .fc-inner{transform:rotateY(180deg);}
-.fc-front,.fc-back{
-  position:absolute;inset:0;backface-visibility:hidden;
-  border-radius:8px;padding:14px;display:flex;
-  flex-direction:column;justify-content:space-between;
-}
-.fc-front{
-  background:var(--surface);border:1px solid rgba(201,168,76,.18);
-  transition:background .4s ease,border-color .4s ease;
-}
-.fc-back{
-  background:rgba(58,191,171,.12);border:1px solid var(--teal);
-  transform:rotateY(180deg);align-items:center;justify-content:center;
-  text-align:center;transition:background .4s ease,border-color .4s ease;
-}
-.fc-back .funded-txt{font-family:Georgia,serif;font-size:1.3rem;color:var(--teal);transition:color .4s ease;}
-.cemoji{font-size:24px;margin-bottom:2px;}
-.ctitle{font-size:13px;color:var(--text-primary);line-height:1.3;flex:1;transition:color .4s ease;}
-.ccost{font-family:Georgia,serif;font-size:12px;color:var(--accent);margin-bottom:6px;transition:color .4s ease;}
-.fund-btn{
+.fc2.funded2:hover{transform:none;border-color:rgba(58,191,171,.25);}
+.fc2-emoji{font-size:22px;flex-shrink:0;width:28px;text-align:center;}
+.fc2-info{flex:1;min-width:0;}
+.fc2-title{font-size:13px;color:var(--text-primary);line-height:1.3;transition:color .4s ease;}
+.fc2-cost{font-family:Georgia,serif;font-size:11px;color:var(--accent);margin-top:2px;transition:color .4s ease;}
+.fc2-action{flex-shrink:0;display:flex;align-items:center;}
+.fc2-btn{
   background:transparent;border:1px solid var(--accent);color:var(--accent);
-  padding:5px 10px;font-size:11px;letter-spacing:.08em;cursor:pointer;
-  border-radius:3px;text-transform:uppercase;transition:all .2s;align-self:flex-start;
+  padding:4px 11px;font-size:10px;letter-spacing:.1em;cursor:pointer;
+  border-radius:3px;text-transform:uppercase;transition:all .2s;white-space:nowrap;
 }
-.fund-btn:hover{background:var(--accent);color:var(--bg);}
-@keyframes shake{0%,100%{transform:translateX(0);}20%{transform:translateX(-6px);}40%{transform:translateX(6px);}60%{transform:translateX(-4px);}80%{transform:translateX(4px);}}
-.fc.shaking{animation:shake .4s ease;}
+.fc2-btn:hover{background:var(--accent);color:var(--bg);}
+.fc2.funded2 .fc2-btn{display:none;}
+.fc2-check{color:var(--teal);font-size:20px;display:none;transition:color .4s ease;}
+.fc2.funded2 .fc2-check{display:block;}
+.fc2-drag-hint{
+  font-size:10px;color:var(--text-secondary);letter-spacing:.05em;
+  margin-right:10px;opacity:.5;transition:color .4s ease;
+}
+.fc2.funded2 .fc2-drag-hint{display:none;}
+/* RIGHT — budget + drop zone */
+.budget-col{
+  flex:2;display:flex;flex-direction:column;min-width:220px;
+}
+.budget-num{
+  font-family:Georgia,serif;font-size:clamp(1.3rem,2.5vw,2.2rem);
+  color:var(--accent);line-height:1;transition:color .4s ease;
+}
+.budget-lbl{
+  font-size:10px;letter-spacing:.3em;color:var(--text-secondary);
+  text-transform:uppercase;margin:4px 0 10px;transition:color .4s ease;
+}
+.budget-progress{
+  height:3px;background:rgba(201,168,76,.1);border-radius:2px;
+  margin-bottom:14px;overflow:hidden;
+}
+#budget-bar-fill{
+  height:100%;width:0%;background:var(--accent);
+  transition:width .9s ease,background .4s ease;
+}
+#drop-zone{
+  flex:1;border:1px dashed rgba(201,168,76,.25);border-radius:8px;
+  display:flex;flex-direction:column;position:relative;
+  overflow:hidden;transition:border-color .2s,background .2s;
+  min-height:100px;
+}
+#drop-zone.drag-over{
+  border-color:var(--accent);background:rgba(201,168,76,.05);
+}
+#drop-hint{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;text-align:center;
+  color:var(--text-secondary);font-size:13px;pointer-events:none;
+  gap:6px;transition:color .4s ease;
+}
+#drop-hint iconify-icon{font-size:28px;color:var(--accent-dim);transition:color .4s ease;}
+#drop-hint small{font-size:11px;opacity:.55;}
+#funded-list{
+  flex:1;overflow-y:auto;padding:10px;display:flex;
+  flex-direction:column;gap:5px;
+}
+#funded-list::-webkit-scrollbar{width:2px;}
+#funded-list::-webkit-scrollbar-thumb{background:var(--accent-dim);}
+.funded-row{
+  display:flex;align-items:center;gap:8px;padding:5px 0;
+  border-bottom:1px solid rgba(58,191,171,.1);font-size:12px;
+  color:var(--teal);animation:fadeSlideIn .3s ease;
+  transition:color .4s ease,border-color .4s ease;
+}
+@keyframes fadeSlideIn{from{opacity:0;transform:translateY(-6px);}to{opacity:1;transform:none;}}
+#spend-msg2{
+  font-family:Georgia,serif;font-size:.85rem;color:var(--teal);
+  text-align:center;padding:8px 10px;transition:color .4s ease;min-height:28px;
+}
+#reset-btn2{
+  background:none;border:1px solid rgba(201,168,76,.18);color:var(--text-secondary);
+  padding:7px;font-size:10px;cursor:pointer;border-radius:4px;
+  letter-spacing:.12em;text-transform:uppercase;transition:all .3s;margin-top:8px;
+  flex-shrink:0;
+}
+#reset-btn2:hover{border-color:var(--accent);color:var(--accent);}
+@keyframes shake{0%,100%{transform:translateX(0);}20%{transform:translateX(-7px);}40%{transform:translateX(7px);}60%{transform:translateX(-4px);}80%{transform:translateX(4px);}}
 /* S8 TIMEMACHINE */
 #s8{background:var(--surface);transition:background .4s ease;}
 .tl-wrap{width:100%;max-width:660px;margin:28px auto 0;padding:0 20px;}
@@ -513,13 +563,27 @@ section{
 
 <!-- SECTION 7: SPEND IT -->
 <section id="s7">
-  <div class="eyebrow" style="text-align:center;width:100%;margin-bottom:2px;">Interactive</div>
-  <div class="hed" style="margin-bottom:6px;">Spend it. See what's left.</div>
-  <div id="remain-val">$1,050,000,000,000</div>
-  <div id="remain-lbl">Remaining</div>
-  <div id="spend-msg"></div>
-  <button id="reset-btn" onclick="resetSpend()">↺ Reset</button>
-  <div id="fund-grid"></div>
+  <div class="spend-layout">
+    <div class="fund-cards-col" id="fund-grid">
+      <div class="eyebrow" style="margin-bottom:4px;flex-shrink:0;">Drag or click to fund</div>
+    </div>
+    <div class="budget-col">
+      <div class="eyebrow">Remaining budget</div>
+      <div class="budget-num" id="remain-val">$1,050,000,000,000</div>
+      <div class="budget-lbl">of $1.05 trillion</div>
+      <div class="budget-progress"><div id="budget-bar-fill"></div></div>
+      <div id="drop-zone">
+        <div id="drop-hint">
+          <iconify-icon icon="mdi:arrow-collapse-down"></iconify-icon>
+          Drop a card here to fund it
+          <small>or click Fund It on any card</small>
+        </div>
+        <div id="funded-list"></div>
+        <div id="spend-msg2"></div>
+      </div>
+      <button id="reset-btn2" onclick="resetSpend()">&#8635; Reset all</button>
+    </div>
+  </div>
 </section>
 
 <!-- SECTION 8: TIME MACHINE -->
@@ -774,56 +838,83 @@ let remaining = 1050000000000, dispVal = 1050000000000;
 const funded = new Set();
 
 function buildFunds() {
-  const g = document.getElementById('fund-grid'); g.innerHTML='';
+  const g = document.getElementById('fund-grid');
+  g.querySelectorAll('.fc2').forEach(el=>el.remove());
   FUNDS.forEach((f,i)=>{
     const d = document.createElement('div');
-    d.className='fc'; d.id='fc'+i;
-    d.innerHTML=`<div class="fc-inner">
-      <div class="fc-front">
-        <div class="cemoji">${f.e}</div>
-        <div class="ctitle">${f.l}</div>
-        <div class="ccost">$${f.c.toLocaleString()}</div>
-        <button class="fund-btn" onclick="fundIt(${i})">Fund It</button>
-      </div>
-      <div class="fc-back"><div class="funded-txt">FUNDED ✓</div></div>
-    </div>`;
+    d.className='fc2'; d.id='fc2-'+i;
+    d.dataset.index=i; d.draggable=true;
+    d.innerHTML=
+      '<span class="fc2-emoji">'+f.e+'</span>'+
+      '<div class="fc2-info">'+
+        '<div class="fc2-title">'+f.l+'</div>'+
+        '<div class="fc2-cost">$'+f.c.toLocaleString()+'</div>'+
+      '</div>'+
+      '<div class="fc2-action">'+
+        '<span class="fc2-drag-hint">drag</span>'+
+        '<iconify-icon class="fc2-check" icon="mdi:check-circle"></iconify-icon>'+
+        '<button class="fc2-btn" onclick="fundIt('+i+')">Fund It</button>'+
+      '</div>';
+    d.addEventListener('dragstart',e=>{
+      e.dataTransfer.setData('text/plain',String(i));
+      setTimeout(()=>d.classList.add('dragging'),0);
+    });
+    d.addEventListener('dragend',()=>d.classList.remove('dragging'));
     g.appendChild(d);
   });
 }
 
+const dropZone = document.getElementById('drop-zone');
+dropZone.addEventListener('dragover',e=>{e.preventDefault();dropZone.classList.add('drag-over');});
+dropZone.addEventListener('dragleave',e=>{if(!dropZone.contains(e.relatedTarget))dropZone.classList.remove('drag-over');});
+dropZone.addEventListener('drop',e=>{
+  e.preventDefault(); dropZone.classList.remove('drag-over');
+  fundIt(parseInt(e.dataTransfer.getData('text/plain')));
+});
+
 function fundIt(i) {
   if(funded.has(i)) return;
   const cost = FUNDS[i].c;
-  const card = document.getElementById('fc'+i);
   if(cost > remaining){
-    card.classList.add('shaking');
-    document.getElementById('spend-msg').style.color='var(--danger)';
-    document.getElementById('spend-msg').textContent='Not enough remaining.';
-    setTimeout(()=>card.classList.remove('shaking'),500);
+    const card = document.getElementById('fc2-'+i);
+    card.style.animation='shake .4s ease';
+    setTimeout(()=>card.style.animation='',500);
+    const msg = document.getElementById('spend-msg2');
+    msg.style.color='var(--danger)'; msg.textContent='Not enough remaining.';
     return;
   }
   funded.add(i); remaining -= cost;
-  card.classList.add('funded');
-  const fromVal = dispVal;
-  const toVal = remaining;
-  gsap.to({v:fromVal},{v:toVal,duration:1,ease:'power2.out',
+  const card = document.getElementById('fc2-'+i);
+  card.classList.add('funded2'); card.draggable=false;
+  const fl = document.getElementById('funded-list');
+  document.getElementById('drop-hint').style.opacity='0';
+  const row = document.createElement('div');
+  row.className='funded-row';
+  row.innerHTML='<span>'+FUNDS[i].e+'</span><span>'+FUNDS[i].l+'</span>';
+  fl.appendChild(row);
+  gsap.to({v:dispVal},{v:remaining,duration:1,ease:'power2.out',
     onUpdate:function(){
       dispVal=this.targets()[0].v;
       document.getElementById('remain-val').textContent='$'+Math.round(dispVal).toLocaleString();
     },
-    onComplete:()=>{dispVal=toVal;}
+    onComplete:()=>{dispVal=remaining;}
   });
-  const msg = document.getElementById('spend-msg');
-  if(remaining <= 0){
+  document.getElementById('budget-bar-fill').style.width=
+    ((1050000000000-remaining)/1050000000000*100)+'%';
+  const msg = document.getElementById('spend-msg2');
+  if(remaining<=0){
     remaining=0; msg.style.color='var(--teal)';
-    msg.textContent='You just did what 195 governments couldn\'t agree to do.';
+    msg.textContent="You just did what 195 governments couldn't agree to do.";
   } else { msg.textContent=''; }
 }
 
 function resetSpend() {
   remaining=1050000000000; dispVal=1050000000000; funded.clear();
   document.getElementById('remain-val').textContent='$1,050,000,000,000';
-  document.getElementById('spend-msg').textContent='';
+  document.getElementById('budget-bar-fill').style.width='0%';
+  document.getElementById('funded-list').innerHTML='';
+  document.getElementById('drop-hint').style.opacity='1';
+  document.getElementById('spend-msg2').textContent='';
   buildFunds();
 }
 buildFunds();
