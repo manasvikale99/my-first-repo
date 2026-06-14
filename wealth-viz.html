@@ -572,12 +572,14 @@ window.addEventListener('load', () => {
 });
 
 // ── LIVE TICKER (S2) ──────────────────────────────────────
-const t0session = Date.now();
-setInterval(() => {
-  const secs = (Date.now()-t0session)/1000;
+const t0session = performance.now();
+function tickLive() {
+  const secs = (performance.now()-t0session)/1000;
   document.getElementById('live-ticker').textContent =
     '$' + Math.round(30100*secs).toLocaleString() + ' earned this session';
-}, 120);
+  requestAnimationFrame(tickLive);
+}
+requestAnimationFrame(tickLive);
 
 // ── BIG MAC (S4) ──────────────────────────────────────────
 function updateBigMac() {
