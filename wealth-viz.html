@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wealth Scale — Elon Musk's $1.05 Trillion</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+<script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tsparticles-slim@2.12.0/tsparticles.slim.bundle.min.js"></script>
+<style>
+:root {
+  --bg: #080808;
+  --surface: #111111;
+  --text-primary: #F5F5F0;
+  --text-secondary: #888880;
+  --accent: #C9A84C;
+  --accent-dim: #7A6330;
+  --danger: #E05252;
+  --teal: #3ABFAB;
+}
+:root.day {
+  --bg: #F7F5F0;
+  --surface: #FFFFFF;
+  --text-primary: #0A0A0A;
+  --text-secondary: #666660;
+  --accent: #8B6914;
+  --accent-dim: #C9A84C;
+  --danger: #CC3333;
+  --teal: #1A8F80;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:auto;}
+body{
+  background:var(--bg);color:var(--text-primary);
+  font-family:system-ui,-apple-system,sans-serif;
+  scroll-snap-type:y mandatory;overflow-y:scroll;
+  transition:background .4s ease,color .4s ease;
+}
+section{
+  scroll-snap-align:start;height:100vh;position:relative;
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:center;overflow:hidden;
+}
+/* TOP BAR */
+#topbar{
+  position:fixed;top:0;left:0;right:0;z-index:1000;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 32px;
+  background:rgba(8,8,8,.72);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(201,168,76,.15);
+  transition:background .4s ease,border-color .4s ease;
+}
+:root.day #topbar{background:rgba(247,245,240,.78);}
+#wordmark{
+  font-family:Georgia,serif;font-size:13px;
+  letter-spacing:.35em;color:var(--accent);
+  text-transform:uppercase;font-weight:normal;
+  transition:color .4s ease;
+}
+#theme-toggle{
+  background:none;border:1px solid var(--accent-dim);
+  color:var(--accent);cursor:pointer;padding:7px 16px;
+  border-radius:4px;font-size:13px;letter-spacing:.08em;
+  display:flex;align-items:center;gap:8px;
+  transition:all .4s ease;
+}
+#theme-toggle:hover{border-color:var(--accent);background:rgba(201,168,76,.1);}
+/* PROGRESS */
+#prog-bar{position:fixed;left:0;top:0;bottom:0;width:3px;z-index:999;background:rgba(201,168,76,.08);}
+#prog-fill{width:100%;height:0%;background:var(--accent);transition:height .08s linear,background .4s ease;}
+/* SECTION COUNTER */
+#sec-count{
+  position:fixed;bottom:28px;right:28px;z-index:999;
+  font-family:Georgia,serif;font-size:13px;color:var(--accent);
+  letter-spacing:.2em;transition:color .4s ease;
+}
+/* TYPOGRAPHY */
+.eyebrow{
+  font-size:12px;letter-spacing:.35em;text-transform:uppercase;
+  color:var(--text-secondary);margin-bottom:20px;
+  transition:color .4s ease;
+}
+.hed{
+  font-family:Georgia,serif;font-size:clamp(1.4rem,3.5vw,2.6rem);
+  font-weight:normal;color:var(--text-primary);text-align:center;
+  line-height:1.25;max-width:820px;margin-bottom:20px;
+  transition:color .4s ease;
+}
+.body-copy{
+  font-size:17px;line-height:1.75;color:var(--text-secondary);
+  max-width:580px;text-align:center;transition:color .4s ease;
+}
+.gold{color:var(--accent);transition:color .4s ease;}
+.teal{color:var(--teal);transition:color .4s ease;}
+/* FLOATING PARTICLES (CSS fallback / overlay) */
+.float-char{
+  position:absolute;font-family:Georgia,serif;
+  color:var(--accent);pointer-events:none;user-select:none;
+  animation:floatUp linear infinite;opacity:0;
+  transition:color .4s ease;
+}
+@keyframes floatUp{
+  0%{transform:translateY(110vh) rotate(0deg);opacity:0;}
+  8%{opacity:.22;}88%{opacity:.18;}
+  100%{transform:translateY(-80px) rotate(25deg);opacity:0;}
+}
+/* S1 HERO */
+#hero{background:var(--bg);transition:background .4s ease;}
+#tsparticles{position:absolute;inset:0;z-index:0;}
+.hero-inner{position:relative;z-index:1;text-align:center;padding:24px;}
+#hero-num{
+  font-family:Georgia,serif;
+  font-size:clamp(2.6rem,8vw,7.5rem);
+  color:var(--accent);font-weight:normal;line-height:1;
+  margin-bottom:24px;transition:color .4s ease;
+}
+#hero-sub{
+  font-family:Georgia,serif;
+  font-size:clamp(1rem,2.2vw,1.5rem);
+  color:var(--text-primary);margin-bottom:12px;
+  transition:color .4s ease;
+}
+#hero-hint{font-size:15px;color:var(--text-secondary);margin-bottom:40px;transition:color .4s ease;}
+.arrow{color:var(--accent);font-size:26px;animation:bob 1.6s ease-in-out infinite;display:block;transition:color .4s ease;}
+@keyframes bob{0%,100%{transform:translateY(0);opacity:.5;}50%{transform:translateY(9px);opacity:1;}}
+/* S2 THE SECOND */
+#s2{background:var(--surface);transition:background .4s ease;}
+.big-rate{
+  font-family:Georgia,serif;font-size:clamp(3.5rem,11vw,9rem);
+  color:var(--accent);line-height:1;margin-bottom:6px;transition:color .4s ease;
+}
+.rate-label{font-size:13px;letter-spacing:.3em;color:var(--text-secondary);text-transform:uppercase;margin-bottom:28px;transition:color .4s ease;}
+#live-ticker{
+  font-family:Georgia,serif;font-size:clamp(1.4rem,3.5vw,2.2rem);
+  color:var(--teal);margin-top:28px;transition:color .4s ease;
+}
+/* S3 STACK */
+#s3{background:var(--bg);transition:background .4s ease;}
+.stack-wrap{display:flex;gap:56px;align-items:flex-end;height:55vh;max-width:860px;width:100%;padding:0 32px;}
+.bar-col{display:flex;flex-direction:column;align-items:center;height:100%;width:64px;}
+#stack-bar{
+  width:56px;height:0%;border-radius:6px 6px 0 0;
+  background:linear-gradient(to top,var(--accent),var(--accent-dim));
+  transition:background .4s ease;
+}
+.markers-col{flex:1;display:flex;flex-direction:column;justify-content:flex-end;gap:20px;}
+.marker{display:flex;align-items:center;gap:14px;opacity:0;transform:translateX(-24px);}
+.marker-icon{color:var(--accent);font-size:22px;flex-shrink:0;transition:color .4s ease;}
+.marker-amt{font-family:Georgia,serif;font-size:15px;color:var(--accent);transition:color .4s ease;}
+.marker-desc{font-size:14px;color:var(--text-secondary);transition:color .4s ease;}
+/* S4 BIGMAC */
+#s4{background:var(--surface);transition:background .4s ease;}
+#bm-country{
+  background:var(--surface);border:1px solid var(--accent-dim);
+  color:var(--text-primary);padding:10px 16px;font-size:15px;
+  border-radius:4px;cursor:pointer;transition:all .4s ease;margin:20px 0 12px;
+}
+#bm-country:hover{border-color:var(--accent);}
+#bm-result{
+  font-family:Georgia,serif;font-size:clamp(1rem,2.8vw,1.5rem);
+  color:var(--teal);text-align:center;min-height:36px;transition:color .4s ease;
+}
+#burger-grid{
+  display:flex;flex-wrap:wrap;gap:4px;max-width:680px;
+  margin:12px auto 0;justify-content:center;min-height:60px;
+}
+.bicon{font-size:18px;animation:pop .2s ease both;}
+@keyframes pop{from{transform:scale(0);opacity:0;}to{transform:scale(1);opacity:1;}}
+#burger-more{font-size:14px;color:var(--text-secondary);text-align:center;margin-top:6px;transition:color .4s ease;}
+/* S5 PEOPLE */
+#s5{background:var(--bg);justify-content:flex-start;padding-top:80px;transition:background .4s ease;}
+.people-wrap{display:flex;gap:40px;width:100%;max-width:960px;padding:0 32px;align-items:flex-start;margin-top:12px;}
+.people-left{flex:0 0 260px;}
+#ppl-cat{
+  width:100%;background:var(--bg);border:1px solid var(--accent-dim);
+  color:var(--text-primary);padding:10px 14px;font-size:14px;
+  border-radius:4px;margin-bottom:20px;transition:all .4s ease;
+}
+#ppl-count{
+  font-family:Georgia,serif;font-size:clamp(1.8rem,4vw,3rem);
+  color:var(--accent);line-height:1.1;transition:color .4s ease;
+}
+#ppl-label{font-size:14px;color:var(--text-secondary);margin-top:8px;line-height:1.5;transition:color .4s ease;}
+.people-right{flex:1;min-height:240px;}
+#person-grid{display:flex;flex-wrap:wrap;gap:3px;max-height:260px;overflow:hidden;}
+.picon{color:var(--teal);font-size:15px;opacity:0;transition:color .4s ease;}
+/* S6 GDP */
+#s6{background:var(--surface);transition:background .4s ease;padding-top:60px;justify-content:center;}
+#gdp-wrap{width:100%;max-width:780px;padding:0 24px;}
+.gdp-tip{
+  position:fixed;background:var(--surface);border:1px solid var(--accent);
+  color:var(--text-primary);padding:8px 14px;font-size:13px;
+  border-radius:4px;pointer-events:none;opacity:0;
+  transition:opacity .15s,background .4s ease,color .4s ease,border-color .4s ease;
+  z-index:500;
+}
+/* S7 SPEND */
+#s7{
+  background:var(--bg);justify-content:flex-start;
+  padding:72px 20px 20px;overflow-y:auto;
+  transition:background .4s ease;
+}
+#remain-val{
+  font-family:Georgia,serif;font-size:clamp(1.8rem,5vw,3.5rem);
+  color:var(--accent);text-align:center;margin-bottom:4px;
+  transition:color .4s ease;
+}
+#remain-lbl{
+  font-size:12px;letter-spacing:.3em;color:var(--text-secondary);
+  text-align:center;text-transform:uppercase;margin-bottom:10px;
+  transition:color .4s ease;
+}
+#spend-msg{
+  text-align:center;font-family:Georgia,serif;font-size:1.1rem;
+  color:var(--teal);min-height:28px;margin-bottom:4px;transition:color .4s ease;
+}
+#reset-btn{
+  display:block;margin:4px auto 16px;background:none;
+  border:1px solid var(--text-secondary);color:var(--text-secondary);
+  padding:6px 18px;font-size:12px;cursor:pointer;border-radius:3px;
+  letter-spacing:.1em;text-transform:uppercase;transition:all .3s;
+}
+#reset-btn:hover{border-color:var(--accent);color:var(--accent);}
+#fund-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+  gap:12px;max-width:980px;width:100%;margin:0 auto;
+}
+.fc{perspective:700px;height:148px;}
+.fc-inner{
+  width:100%;height:100%;position:relative;
+  transform-style:preserve-3d;transition:transform .5s ease;
+}
+.fc.funded .fc-inner{transform:rotateY(180deg);}
+.fc-front,.fc-back{
+  position:absolute;inset:0;backface-visibility:hidden;
+  border-radius:8px;padding:14px;display:flex;
+  flex-direction:column;justify-content:space-between;
+}
+.fc-front{
+  background:var(--surface);border:1px solid rgba(201,168,76,.18);
+  transition:background .4s ease,border-color .4s ease;
+}
+.fc-back{
+  background:rgba(58,191,171,.12);border:1px solid var(--teal);
+  transform:rotateY(180deg);align-items:center;justify-content:center;
+  text-align:center;transition:background .4s ease,border-color .4s ease;
+}
+.fc-back .funded-txt{font-family:Georgia,serif;font-size:1.3rem;color:var(--teal);transition:color .4s ease;}
+.cemoji{font-size:24px;margin-bottom:2px;}
+.ctitle{font-size:13px;color:var(--text-primary);line-height:1.3;flex:1;transition:color .4s ease;}
+.ccost{font-family:Georgia,serif;font-size:12px;color:var(--accent);margin-bottom:6px;transition:color .4s ease;}
+.fund-btn{
+  background:transparent;border:1px solid var(--accent);color:var(--accent);
+  padding:5px 10px;font-size:11px;letter-spacing:.08em;cursor:pointer;
+  border-radius:3px;text-transform:uppercase;transition:all .2s;align-self:flex-start;
+}
+.fund-btn:hover{background:var(--accent);color:var(--bg);}
+@keyframes shake{0%,100%{transform:translateX(0);}20%{transform:translateX(-6px);}40%{transform:translateX(6px);}60%{transform:translateX(-4px);}80%{transform:translateX(4px);}}
+.fc.shaking{animation:shake .4s ease;}
+/* S8 TIMEMACHINE */
+#s8{background:var(--surface);transition:background .4s ease;}
+.tl-wrap{width:100%;max-width:660px;margin:28px auto 0;padding:0 20px;}
+.tl-top-labels{display:flex;justify-content:space-between;margin-bottom:8px;font-size:13px;color:var(--text-secondary);transition:color .4s ease;}
+#tl-mid{font-family:Georgia,serif;color:var(--accent);font-size:14px;transition:color .4s ease;}
+.tl-track{height:7px;background:rgba(201,168,76,.12);border-radius:4px;overflow:hidden;}
+#tl-fill{height:100%;width:0%;background:linear-gradient(to right,var(--accent),var(--accent-dim));border-radius:4px;transition:background .4s ease;}
+.tl-bot-labels{display:flex;justify-content:space-between;margin-top:7px;font-size:12px;color:var(--text-secondary);transition:color .4s ease;}
+.big-remain{
+  font-family:Georgia,serif;font-size:clamp(2.5rem,7vw,5rem);
+  color:var(--accent);text-align:center;margin-top:28px;
+  line-height:1;transition:color .4s ease;
+}
+/* S9 TABLE */
+#s9{
+  background:var(--bg);justify-content:flex-start;
+  padding:72px 20px 24px;overflow-y:auto;transition:background .4s ease;
+}
+.data-tbl{width:100%;max-width:860px;border-collapse:collapse;margin:0 auto;}
+.data-tbl th{
+  text-align:left;font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--accent);padding:12px 14px;border-bottom:1px solid var(--accent-dim);
+  transition:color .4s ease,border-color .4s ease;
+}
+.data-tbl td{
+  padding:13px 14px;font-size:15px;color:var(--text-primary);line-height:1.4;
+  border-bottom:1px solid rgba(201,168,76,.06);transition:color .4s ease,background .4s ease,border-color .4s ease;
+}
+.data-tbl tr:nth-child(even) td{background:rgba(201,168,76,.04);}
+.data-tbl td:nth-child(3){color:var(--teal);font-family:Georgia,serif;}
+.trow{opacity:0;transform:translateY(18px);}
+/* S10 KICKER */
+#s10{background:var(--bg);transition:background .4s ease;}
+.kl{opacity:0;transform:translateY(22px);text-align:center;transition:color .4s ease;}
+.kl.big{font-family:Georgia,serif;font-size:clamp(2rem,6.5vw,5.5rem);color:var(--text-primary);line-height:1.1;margin-bottom:14px;}
+.kl.gold-k{font-family:Georgia,serif;font-size:clamp(1.2rem,2.8vw,1.8rem);color:var(--accent);margin-top:28px;}
+.kl.muted-k{font-size:clamp(.9rem,1.8vw,1.1rem);color:var(--text-secondary);margin-top:14px;}
+/* RESPONSIVE */
+@media(max-width:680px){
+  .people-wrap{flex-direction:column;}
+  .people-left{flex:unset;width:100%;}
+  #fund-grid{grid-template-columns:1fr 1fr;}
+  .stack-wrap{gap:28px;}
+  #topbar{padding:12px 18px;}
+}
+@media(prefers-reduced-motion:reduce){
+  *{animation:none!important;}
+  .float-char{display:none;}
+}
+</style>
+</head>
+<body>
+
+<!-- FIXED UI -->
+<div id="topbar">
+  <div id="wordmark">Wealth Scale</div>
+  <button id="theme-toggle">
+    <iconify-icon id="t-icon" icon="mdi:weather-night"></iconify-icon>
+    <span id="t-label">Day Mode</span>
+  </button>
+</div>
+<div id="prog-bar"><div id="prog-fill"></div></div>
+<div id="sec-count">01 / 10</div>
+
+<!-- SECTION 1: HERO -->
+<section id="hero">
+  <div id="tsparticles"></div>
+  <div class="hero-inner">
+    <div id="hero-num">$0</div>
+    <div id="hero-sub">Elon Musk's net worth. As of June 12, 2026.</div>
+    <div id="hero-hint">Scroll to understand what this number actually means.</div>
+    <iconify-icon class="arrow" icon="mdi:chevron-down"></iconify-icon>
+  </div>
+</section>
+
+<!-- SECTION 2: THE SECOND -->
+<section id="s2">
+  <div class="eyebrow">Every Second</div>
+  <div class="hed">Every second he's been alive...</div>
+  <div class="big-rate">$30,100</div>
+  <div class="rate-label">per second — every second — since birth</div>
+  <div class="body-copy">
+    To have earned $1.05 trillion since 1971, Musk would have needed to earn
+    <span class="gold">$30,100 every single second</span> — including while sleeping.
+  </div>
+  <div id="live-ticker">$0 earned this session</div>
+</section>
+
+<!-- SECTION 3: STACK OF BILLS -->
+<section id="s3">
+  <div class="eyebrow">Physical Scale</div>
+  <div class="hed">If you stacked it in $100 bills...</div>
+  <div class="stack-wrap">
+    <div class="bar-col">
+      <div id="stack-bar"></div>
+    </div>
+    <div class="markers-col">
+      <div class="marker" id="m3">
+        <iconify-icon class="marker-icon" icon="mdi:satellite-variant"></iconify-icon>
+        <div>
+          <div class="marker-amt">$1,000,000,000,000</div>
+          <div class="marker-desc">10,000 km — 26× the ISS orbit altitude</div>
+        </div>
+      </div>
+      <div class="marker" id="m2">
+        <iconify-icon class="marker-icon" icon="game-icons:eiffel-tower"></iconify-icon>
+        <div>
+          <div class="marker-amt">$1,000,000,000</div>
+          <div class="marker-desc">Eiffel Tower height (324 m)</div>
+        </div>
+      </div>
+      <div class="marker" id="m1">
+        <iconify-icon class="marker-icon" icon="mdi:human-male-height"></iconify-icon>
+        <div>
+          <div class="marker-amt">$1,000,000</div>
+          <div class="marker-desc">A tall person (1.07 m)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 4: BIG MAC -->
+<section id="s4">
+  <div class="eyebrow">Consumer Scale</div>
+  <div class="hed">181,000,000,000 Big Macs</div>
+  <div class="body-copy">At $5.80 each — one for every person on Earth, <span class="gold">22 times over.</span></div>
+  <select id="bm-country">
+    <option value="India|1440000000">India (1.44B people)</option>
+    <option value="USA|335000000">USA (335M)</option>
+    <option value="Pakistan|230000000">Pakistan (230M)</option>
+    <option value="Nigeria|220000000">Nigeria (220M)</option>
+    <option value="Brazil|215000000">Brazil (215M)</option>
+    <option value="Bangladesh|170000000">Bangladesh (170M)</option>
+    <option value="Ethiopia|128000000">Ethiopia (128M)</option>
+  </select>
+  <div id="bm-result"></div>
+  <div id="burger-grid"></div>
+  <div id="burger-more"></div>
+</section>
+
+<!-- SECTION 5: PEOPLE SCALE -->
+<section id="s5">
+  <div class="eyebrow" style="align-self:flex-start;padding-left:32px;">Human Scale</div>
+  <div class="hed" style="align-self:flex-start;padding-left:32px;text-align:left;">How many people could this pay?</div>
+  <div class="people-wrap">
+    <div class="people-left">
+      <select id="ppl-cat" onchange="updatePeople()">
+        <option value="teachers">US public school teachers ($74,495/yr)</option>
+        <option value="poverty">End extreme poverty ($785/person/yr)</option>
+        <option value="vaccines">Global child vaccination ($73/child)</option>
+        <option value="hiv">HIV treatment for all ($100/person/yr)</option>
+        <option value="nigeria">Nigerian annual income ($1,600)</option>
+        <option value="india">Indian annual income ($2,600)</option>
+      </select>
+      <div id="ppl-count">14,100,000</div>
+      <div id="ppl-label">US public school teachers paid for 1 year</div>
+    </div>
+    <div class="people-right">
+      <div id="person-grid"></div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 6: GDP SMACKDOWN -->
+<section id="s6">
+  <div class="eyebrow">Geopolitical Scale</div>
+  <div class="hed" style="margin-bottom:18px;">His wealth vs. entire countries' annual GDP</div>
+  <div id="gdp-wrap"><svg id="gdp-svg"></svg></div>
+  <div id="gdp-tip" class="gdp-tip"></div>
+  <div class="body-copy" style="margin-top:18px;font-size:15px;">
+    His wealth exceeds the combined GDP of the <span class="gold">48 poorest nations</span> on Earth.
+  </div>
+</section>
+
+<!-- SECTION 7: SPEND IT -->
+<section id="s7">
+  <div class="eyebrow" style="text-align:center;width:100%;margin-bottom:2px;">Interactive</div>
+  <div class="hed" style="margin-bottom:6px;">Spend it. See what's left.</div>
+  <div id="remain-val">$1,050,000,000,000</div>
+  <div id="remain-lbl">Remaining</div>
+  <div id="spend-msg"></div>
+  <button id="reset-btn" onclick="resetSpend()">↺ Reset</button>
+  <div id="fund-grid"></div>
+</section>
+
+<!-- SECTION 8: TIME MACHINE -->
+<section id="s8">
+  <div class="eyebrow">Temporal Scale</div>
+  <div class="hed">He started spending at birth. He's still not done.</div>
+  <div class="body-copy">$1 million per hour. Every hour. Since 1971.</div>
+  <div class="tl-wrap">
+    <div class="tl-top-labels">
+      <span>1971</span>
+      <span id="tl-mid"></span>
+      <span>2026</span>
+    </div>
+    <div class="tl-track"><div id="tl-fill"></div></div>
+    <div class="tl-bot-labels"><span>Born</span><span>Today — $481.8B spent</span></div>
+  </div>
+  <div class="big-remain" id="tl-remain">$568.2B</div>
+  <div style="font-size:15px;color:var(--text-secondary);text-align:center;margin-top:10px;transition:color .4s ease;">Still remaining after 55 years of $1M/hour spending</div>
+  <div class="body-copy" style="margin-top:20px;font-style:italic;">"And he'd only be halfway through."</div>
+</section>
+
+<!-- SECTION 9: TABLE -->
+<section id="s9">
+  <div class="eyebrow" style="text-align:center;width:100%;">Global Initiatives</div>
+  <div class="hed">What the world needs. What he could fund.</div>
+  <table class="data-tbl" id="init-table">
+    <thead>
+      <tr>
+        <th>Initiative</th>
+        <th>Cost</th>
+        <th>Musk Could Fund</th>
+      </tr>
+    </thead>
+    <tbody id="tbl-body"></tbody>
+  </table>
+</section>
+
+<!-- SECTION 10: KICKER -->
+<section id="s10">
+  <div class="kl big" id="k1">$27,000,000 per day</div>
+  <div class="kl big" id="k2">Every day.</div>
+  <div class="kl big" id="k3">For 100 years.</div>
+  <div class="kl big" id="k4">That's what $1 trillion looks like.</div>
+  <div class="kl gold-k" id="k5">One person holds this.</div>
+  <div class="kl muted-k" id="k6">The 48 poorest nations on Earth produce less.</div>
+</section>
+
+<script>
+// ── THEME ──────────────────────────────────────────────────
+let dark = true;
+document.getElementById('theme-toggle').addEventListener('click', () => {
+  dark = !dark;
+  document.documentElement.classList.toggle('day', !dark);
+  document.getElementById('t-icon').setAttribute('icon', dark ? 'mdi:weather-night' : 'mdi:weather-sunny');
+  document.getElementById('t-label').textContent = dark ? 'Day Mode' : 'Night Mode';
+  spawnFloaters();
+});
+
+// ── SCROLL UI ──────────────────────────────────────────────
+const sections = Array.from(document.querySelectorAll('section'));
+window.addEventListener('scroll', () => {
+  const st = window.scrollY;
+  const dh = document.documentElement.scrollHeight - window.innerHeight;
+  document.getElementById('prog-fill').style.height = (dh > 0 ? (st/dh)*100 : 0) + '%';
+  let cur = 0;
+  sections.forEach((s,i) => { if(st >= s.offsetTop - window.innerHeight/2) cur = i; });
+  document.getElementById('sec-count').textContent = String(cur+1).padStart(2,'0') + ' / 10';
+});
+
+// ── HERO COUNTER ───────────────────────────────────────────
+const TARGET = 1050000000000;
+function fmtHero(n) {
+  if(n >= 1e12) return '$' + (n/1e12).toFixed(3) + 'T';
+  if(n >= 1e9)  return '$' + (n/1e9).toFixed(1) + 'B';
+  if(n >= 1e6)  return '$' + Math.round(n/1e6) + 'M';
+  return '$' + Math.round(n).toLocaleString();
+}
+(function runCounter(){
+  const el = document.getElementById('hero-num');
+  const dur = 3200, t0 = performance.now();
+  (function tick(now){
+    const p = Math.min((now-t0)/dur, 1);
+    const e = 1 - Math.pow(1-p, 3);
+    el.textContent = p >= .99 ? '$1,050,000,000,000' : fmtHero(e * TARGET);
+    if(p < 1) requestAnimationFrame(tick);
+  })(t0);
+})();
+
+// ── FLOATING DOLLAR SIGNS (CSS particles) ─────────────────
+function getAccent() { return dark ? '#C9A84C' : '#8B6914'; }
+function spawnFloaters() {
+  const hero = document.getElementById('hero');
+  hero.querySelectorAll('.float-char').forEach(e=>e.remove());
+  const chars = ['$','$','$','•','$','•'];
+  for(let i=0;i<22;i++){
+    const el = document.createElement('span');
+    el.className = 'float-char';
+    el.textContent = chars[i % chars.length];
+    el.style.cssText = [
+      'left:' + (Math.random()*96+2) + '%',
+      'font-size:' + (Math.random()*18+10) + 'px',
+      'animation-duration:' + (Math.random()*18+12) + 's',
+      'animation-delay:-' + (Math.random()*20) + 's',
+    ].join(';');
+    hero.appendChild(el);
+  }
+}
+spawnFloaters();
+
+// tsParticles (enhance if available)
+window.addEventListener('load', () => {
+  if(window.tsParticles){
+    tsParticles.load('tsparticles',{
+      background:{color:'transparent'},
+      particles:{
+        number:{value:18},
+        color:{value:'#C9A84C'},
+        shape:{type:'circle'},
+        opacity:{value:{min:.05,max:.2}},
+        size:{value:{min:2,max:5}},
+        move:{enable:true,speed:.3,direction:'top',outModes:'out'}
+      },
+      interactivity:{events:{onClick:{enable:false},onHover:{enable:false}}}
+    }).catch(()=>{});
+  }
+});
+
+// ── LIVE TICKER (S2) ──────────────────────────────────────
+const t0session = Date.now();
+setInterval(() => {
+  const secs = (Date.now()-t0session)/1000;
+  document.getElementById('live-ticker').textContent =
+    '$' + Math.round(30100*secs).toLocaleString() + ' earned this session';
+}, 120);
+
+// ── BIG MAC (S4) ──────────────────────────────────────────
+function updateBigMac() {
+  const [name, pop] = document.getElementById('bm-country').value.split('|');
+  const perPerson = Math.floor(181000000000 / +pop);
+  document.getElementById('bm-result').textContent =
+    'That\'s ' + perPerson.toLocaleString() + ' Big Macs per person in ' + name;
+  const grid = document.getElementById('burger-grid');
+  grid.innerHTML = '';
+  const show = Math.min(200, perPerson);
+  for(let i=0;i<show;i++){
+    const s = document.createElement('span');
+    s.className = 'bicon'; s.textContent = '🍔';
+    s.style.animationDelay = (i*.008)+'s';
+    grid.appendChild(s);
+  }
+  document.getElementById('burger-more').textContent =
+    perPerson > 200 ? '+' + (perPerson-200).toLocaleString() + ' more' : '';
+}
+document.getElementById('bm-country').addEventListener('change', updateBigMac);
+updateBigMac();
+
+// ── PEOPLE SCALE (S5) ─────────────────────────────────────
+const PPL = {
+  teachers:{ count:'14,100,000', label:'US public school teachers paid for 1 year' },
+  poverty: { count:'700,000,000', label:'people lifted above extreme poverty for 1.9 years ($785/person)' },
+  vaccines:{ count:'14,400,000,000', label:'children globally vaccinated — 1 year (UNICEF $73/child)' },
+  hiv:     { count:'39,000,000 × 269 yrs', label:'all HIV+ patients treated for 269 consecutive years' },
+  nigeria: { count:'220,000,000', label:'every Nigerian given 3 years of average income ($1,600/yr)' },
+  india:   { count:'403,000,000', label:'Indians given 1 year of average income ($2,600/yr)' }
+};
+function updatePeople() {
+  const key = document.getElementById('ppl-cat').value;
+  const d = PPL[key];
+  document.getElementById('ppl-count').textContent = d.count;
+  document.getElementById('ppl-label').textContent = d.label;
+  const grid = document.getElementById('person-grid');
+  grid.innerHTML = '';
+  for(let i=0;i<200;i++){
+    const ic = document.createElement('iconify-icon');
+    ic.setAttribute('icon','mdi:account');
+    ic.className = 'picon';
+    grid.appendChild(ic);
+  }
+  grid.querySelectorAll('.picon').forEach((ic,i) => {
+    gsap.to(ic,{opacity:1,delay:i*.015,duration:.25});
+  });
+}
+updatePeople();
+
+// ── GDP CHART (D3, S6) ────────────────────────────────────
+const GDP_DATA = [
+  {n:'Musk',v:1050,m:true},
+  {n:'Sweden',v:590,m:false},
+  {n:'Denmark',v:400,m:false},
+  {n:'Portugal',v:290,m:false},
+  {n:'New Zealand',v:250,m:false},
+  {n:'Hungary',v:220,m:false},
+  {n:'Ukraine',v:180,m:false},
+  {n:'Ethiopia',v:160,m:false},
+  {n:'Kenya',v:120,m:false},
+  {n:'Niger',v:19.5,m:false},
+  {n:'Somalia',v:13.9,m:false},
+];
+let gdpBuilt = false;
+function buildGDP() {
+  if(gdpBuilt) return; gdpBuilt = true;
+  const wrap = document.getElementById('gdp-wrap');
+  const W = Math.min(wrap.clientWidth, 740);
+  const bH=24, gap=9, mL=112, mR=72;
+  const H = GDP_DATA.length*(bH+gap)+16;
+  const svg = d3.select('#gdp-svg').attr('width',W).attr('height',H);
+  const x = d3.scaleLinear().domain([0,1050]).range([0,W-mL-mR]);
+  const tip = document.getElementById('gdp-tip');
+  const g = svg.selectAll('g').data(GDP_DATA).enter().append('g')
+    .attr('transform',(_,i)=>`translate(${mL},${i*(bH+gap)+8})`);
+  g.append('text')
+    .attr('x',-8).attr('y',bH/2+5).attr('text-anchor','end')
+    .attr('fill',d=>d.m?'var(--accent)':'var(--text-secondary)')
+    .attr('font-size',13).attr('font-family',d=>d.m?'Georgia,serif':'system-ui')
+    .text(d=>d.n);
+  g.append('rect')
+    .attr('height',bH).attr('rx',3).attr('width',0)
+    .attr('fill',d=>d.m?'var(--accent)':'var(--teal)')
+    .attr('opacity',d=>d.m?1:.65)
+    .on('mousemove',(ev,d)=>{
+      if(d.m) return;
+      tip.style.opacity=1;
+      tip.style.left=(ev.clientX+14)+'px';
+      tip.style.top=(ev.clientY-28)+'px';
+      tip.textContent='Musk\'s wealth is '+(1050/d.v).toFixed(1)+'× '+d.n+'\'s GDP';
+    })
+    .on('mouseleave',()=>tip.style.opacity=0)
+    .transition().duration(900).delay((_,i)=>i*70)
+    .attr('width',d=>x(d.v));
+  g.append('text')
+    .attr('x',d=>x(d.v)+6).attr('y',bH/2+5)
+    .attr('fill','var(--text-secondary)').attr('font-size',11)
+    .text(d=>'$'+d.v+'B');
+}
+
+// ── SPEND IT (S7) ─────────────────────────────────────────
+const FUNDS = [
+  {e:'🌍',l:'End world hunger for 1 year',c:93000000000},
+  {e:'💧',l:'Universal clean water (one-time)',c:1040000000000},
+  {e:'🏫',l:'Build every missing classroom',c:500000000000},
+  {e:'🦟',l:'Eradicate malaria (one-time)',c:10000000000},
+  {e:'💉',l:'Vaccinate every child (1 year)',c:10000000000},
+  {e:'🏥',l:'WHO budget for 175 years',c:1050000000000},
+  {e:'🌐',l:'UN budget for 300 years',c:1050000000000},
+  {e:'🚀',l:'7 International Space Stations',c:1050000000000},
+  {e:'🏛️',l:'210 Great Pyramids of Giza',c:1050000000000},
+  {e:'🦠',l:'HIV treatment for all (1 year)',c:3900000000},
+];
+let remaining = 1050000000000, dispVal = 1050000000000;
+const funded = new Set();
+
+function buildFunds() {
+  const g = document.getElementById('fund-grid'); g.innerHTML='';
+  FUNDS.forEach((f,i)=>{
+    const d = document.createElement('div');
+    d.className='fc'; d.id='fc'+i;
+    d.innerHTML=`<div class="fc-inner">
+      <div class="fc-front">
+        <div class="cemoji">${f.e}</div>
+        <div class="ctitle">${f.l}</div>
+        <div class="ccost">$${f.c.toLocaleString()}</div>
+        <button class="fund-btn" onclick="fundIt(${i})">Fund It</button>
+      </div>
+      <div class="fc-back"><div class="funded-txt">FUNDED ✓</div></div>
+    </div>`;
+    g.appendChild(d);
+  });
+}
+
+function fundIt(i) {
+  if(funded.has(i)) return;
+  const cost = FUNDS[i].c;
+  const card = document.getElementById('fc'+i);
+  if(cost > remaining){
+    card.classList.add('shaking');
+    document.getElementById('spend-msg').style.color='var(--danger)';
+    document.getElementById('spend-msg').textContent='Not enough remaining.';
+    setTimeout(()=>card.classList.remove('shaking'),500);
+    return;
+  }
+  funded.add(i); remaining -= cost;
+  card.classList.add('funded');
+  const fromVal = dispVal;
+  const toVal = remaining;
+  gsap.to({v:fromVal},{v:toVal,duration:1,ease:'power2.out',
+    onUpdate:function(){
+      dispVal=this.targets()[0].v;
+      document.getElementById('remain-val').textContent='$'+Math.round(dispVal).toLocaleString();
+    },
+    onComplete:()=>{dispVal=toVal;}
+  });
+  const msg = document.getElementById('spend-msg');
+  if(remaining <= 0){
+    remaining=0; msg.style.color='var(--teal)';
+    msg.textContent='You just did what 195 governments couldn\'t agree to do.';
+  } else { msg.textContent=''; }
+}
+
+function resetSpend() {
+  remaining=1050000000000; dispVal=1050000000000; funded.clear();
+  document.getElementById('remain-val').textContent='$1,050,000,000,000';
+  document.getElementById('spend-msg').textContent='';
+  buildFunds();
+}
+buildFunds();
+
+// ── TABLE DATA (S9) ───────────────────────────────────────
+const ROWS = [
+  ['End world hunger','$93B/yr','11.3 years'],
+  ['Clean water for all','$1.04T one-time','Done. Forever.'],
+  ['Global child vaccines','$10B/yr','105 years'],
+  ['Malaria eradication','$10B one-time','105 campaigns'],
+  ['WHO operating budget','$6B/yr','175 years'],
+  ['UN operating budget','$3.5B/yr','300 years'],
+  ['Global refugee aid','$10B/yr','105 years'],
+  ['Africa infrastructure gap','$600B one-time','Fully funded'],
+  ['Global mental health (10yr)','$80B total','13 decades'],
+];
+const tbody = document.getElementById('tbl-body');
+ROWS.forEach(r=>{
+  const tr=document.createElement('tr');
+  tr.className='trow';
+  tr.innerHTML=`<td>${r[0]}</td><td style="color:var(--text-secondary)">${r[1]}</td><td>${r[2]}</td>`;
+  tbody.appendChild(tr);
+});
+
+// ── GSAP + ScrollTrigger ──────────────────────────────────
+gsap.registerPlugin(ScrollTrigger);
+
+// Entrance animations for generic elements
+document.querySelectorAll('.eyebrow,.hed,.body-copy').forEach(el=>{
+  gsap.set(el,{opacity:0,y:28});
+  ScrollTrigger.create({
+    trigger:el,start:'top 88%',once:true,
+    onEnter:()=>gsap.to(el,{opacity:1,y:0,duration:.7,ease:'power2.out'})
+  });
+});
+
+// S2 live ticker entrance
+gsap.set('#live-ticker',{opacity:0,y:20});
+ScrollTrigger.create({trigger:'#s2',start:'top center',once:true,
+  onEnter:()=>gsap.to('#live-ticker',{opacity:1,y:0,duration:.8,delay:.4})
+});
+
+// S3 stack bar
+ScrollTrigger.create({trigger:'#s3',start:'top center',once:true,onEnter:()=>{
+  gsap.to('#stack-bar',{height:'100%',duration:1.6,ease:'power2.out'});
+  ['#m1','#m2','#m3'].forEach((id,i)=>{
+    gsap.to(id,{opacity:1,x:0,delay:.3+i*.45,duration:.55,ease:'power2.out'});
+  });
+}});
+
+// S6 GDP build
+ScrollTrigger.create({trigger:'#s6',start:'top 60%',once:true,onEnter:buildGDP});
+
+// S8 timeline
+ScrollTrigger.create({trigger:'#s8',start:'top center',once:true,onEnter:()=>{
+  gsap.to('#tl-fill',{width:'45.9%',duration:2,ease:'power2.out'});
+  gsap.to({v:0},{v:481800000000,duration:2,ease:'power2.out',
+    onUpdate:function(){
+      document.getElementById('tl-mid').textContent=
+        '$'+Math.round(this.targets()[0].v/1e9).toLocaleString()+'B spent';
+    }
+  });
+  gsap.set('#tl-remain',{opacity:0,y:20});
+  gsap.to('#tl-remain',{opacity:1,y:0,delay:1.2,duration:.7,ease:'power2.out'});
+}});
+
+// S9 table rows
+ScrollTrigger.create({trigger:'#s9',start:'top center',once:true,onEnter:()=>{
+  document.querySelectorAll('.trow').forEach((r,i)=>{
+    gsap.to(r,{opacity:1,y:0,delay:i*.09,duration:.5,ease:'power2.out'});
+  });
+}});
+
+// S10 kicker lines
+ScrollTrigger.create({trigger:'#s10',start:'top center',once:true,onEnter:()=>{
+  ['#k1','#k2','#k3','#k4','#k5','#k6'].forEach((id,i)=>{
+    gsap.to(id,{opacity:1,y:0,delay:i*.38,duration:.7,ease:'power2.out'});
+  });
+}});
+</script>
+</body>
+</html>
